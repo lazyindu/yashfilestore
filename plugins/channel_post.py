@@ -19,7 +19,7 @@ async def channel_post(client: Client, message: Message):
             print(f"Error adding user: {e}")
             pass
 
-    if FORCE_SUB_CHANNEL and FORCE_SUB_CHANNEL2 and FORCE_SUB_CHANNEL3 and not await is_subscribed(client, message):
+    if (FORCE_SUB_CHANNEL or FORCE_SUB_CHANNEL2 or FORCE_SUB_CHANNEL3) and not await is_subscribed(client, message):
         # User is not subscribed to any of the required channels, trigger force_sub logic
         return await lazy_force_sub(client, message)
 
