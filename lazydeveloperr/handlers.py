@@ -48,32 +48,29 @@ async def save_batch_media_in_channel(bot: Client, editable: Message, message_id
                 continue
             message_ids_str += f"{str(sent_message.id)} "
             await asyncio.sleep(2)
-        SaveMessage = await bot.send_message(
-            chat_id=CHANNEL_ID,
-            text=message_ids_str,
-            disable_web_page_preview=True,
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("Delete Batch", callback_data="closeMessage")
-            ]])
-        )
-        try:
-            post_message = await message.copy(chat_id = bot.db_channel.id, disable_notification=True)
-        except FloodWait as e:
-            await asyncio.sleep(e.x)
-            post_message = await message.copy(chat_id = bot.db_channel.id, disable_notification=True)
-        except Exception as e:
-            print(e)
-            await bot.edit_text("Something went Wrong..!")
-            return
-        converted_id = post_message.id * abs(bot.db_channel.id)
-        string = f"get-{converted_id}"
-        base64_string = await encode(string)
-        link = f"https://t.me/{bot.username}?start={base64_string}"
 
-        share_link = f"https://t.me/{bot.username}?start=LazyDeveloperr_{str_to_b64(str(SaveMessage.id))}"
+        # try:
+        #     post_message = await message.copy(chat_id = bot.db_channel.id, disable_notification=True)
+        # except FloodWait as e:
+        #     await asyncio.sleep(e.x)
+        #     post_message = await message.copy(chat_id = bot.db_channel.id, disable_notification=True)
+        # except Exception as e:
+        #     print(e)
+        #     await bot.edit_text("Something went Wrong..!")
+        #     return
+        
+        converted_batch_ids = message_ids_str.strip()
+        # converted_id = post_message.id * abs(bot.db_channel.id)
+        # string = f"get-{converted_id}"
+        # base64_string = await encode(string)
+        base64_batch_string = await encode(f"get-{converted_batch_ids}")
+
+        link = f"https://t.me/{bot.username}?start={base64_batch_string}"
+
+        # share_link = f"https://t.me/{bot.username}?start=LazyDeveloperr_{str_to_b64(str(SaveMessage.id))}"
 
         await editable.edit(
-            f"Here is your batch link: {link} \n\n link 2: {share_link}",
+            f"Here is your batch link: {link}",
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton("⚡️ Open Link ⚡️", url=link)]]
             ),
