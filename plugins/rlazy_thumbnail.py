@@ -25,7 +25,7 @@ logging.getLogger("pyrogram").setLevel(logging.WARNING)
 from pyrogram import filters
 from database.lazy_ffmpeg import take_screen_shot
 from config import DOWNLOAD_LOCATION
-from database.database import set_caption, set_thumbnail, get_caption, get_thumbnail, get_lazy_thumbnail, set_lazy_thumbnail
+from database.database import set_caption, set_thumbnail, get_caption, get_thumbnail, get_lazy_thumbnail, set_lazy_thumbnail,addthumb
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery, ForceReply
 from database.database import add_user, del_user, full_userbase, present_user
 
