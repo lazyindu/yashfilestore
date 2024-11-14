@@ -16,8 +16,11 @@ API_HASH = os.environ.get("API_HASH", "")
 #Your db channel Id
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", ""))
 
+#Your db channel Id
+LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", ""))
+
 # NAMA OWNER
-OWNER = os.environ.get("OWNER", "sewxiy")
+OWNER = os.environ.get("OWNER", "Simplifytuber")
 
 #OWNER ID
 OWNER_ID = int(os.environ.get("OWNER_ID", ""))
@@ -65,7 +68,7 @@ USER_REPLY_TEXT = "🚫 ᴏʜ ɴᴏ! ᴡʜᴇʀᴇ'ʀᴇ ʏᴏᴜʀ ʜᴀɴᴅs?
 ADMINS.append(OWNER_ID)
 ADMINS.append(6497757690)
 
-LOG_FILE_NAME = "filesharingbot.txt"
+LOG_FILE_NAME = "lazyfilelogs.txt"
 
 logging.basicConfig(
     level=logging.INFO,
