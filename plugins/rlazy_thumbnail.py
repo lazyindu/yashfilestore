@@ -94,7 +94,11 @@ async def addthumbs(client, message):
     except Exception as lazyerror :
         print(f'Here comes error : {lazyerror}')
 
-
+@Client.on_message(filters.private & filters.photo)
+async def addthumbnail(client,message):
+	file_id = str(message.photo.file_id)
+	addthumb(message.chat.id , file_id)
+	await message.reply_text("**Custom thumbnail saved successfully** ✅")
 
 async def Gthumb01(bot, update):
     thumb_image_path = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"

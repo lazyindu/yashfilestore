@@ -28,7 +28,11 @@ async def del_user(user_id: int):
     return
 
 
-async def set_thumbnail(id, file_id):
+def addthumb(chat_id, file_id):
+    user_data.update_one({"_id": chat_id}, {"$set": {"file_id": file_id}})
+
+
+def set_thumbnail(id, file_id):
     user_data.update_one({'id': int(id)}, {'$set': {'file_id': file_id}})
 
 
