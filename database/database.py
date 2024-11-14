@@ -27,15 +27,6 @@ async def del_user(user_id: int):
     user_data.delete_one({'_id': user_id})
     return
 
-async def get_thumbnail(id):
-    try:
-        thumbnail = await user_data.find_one({'id': int(id)})
-        if thumbnail:
-            return thumbnail.get('file_id')
-        else:
-            return None
-    except Exception as e:
-        print(e)
 
 async def set_thumbnail(id, file_id):
     user_data.update_one({'id': int(id)}, {'$set': {'file_id': file_id}})

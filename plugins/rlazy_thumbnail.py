@@ -70,94 +70,30 @@ async def removethumb(client, message):
 
 @Client.on_message(filters.private & filters.command(['set_thumbnail','set_thumb','st']))
 async def addthumbs(client, message):
-    replied = message.reply_to_message
-    id = message.from_user.id
-    if not message.from_user:
-        return await message.reply_text("What the hell is this...")
-    
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass
+    try:
+        replied = message.reply_to_message
+        id = message.from_user.id
+        if not message.from_user:
+            return await message.reply_text("What the hell is this...")
+        
+        if not await present_user(id):
+            try:
+                await add_user(id)
+            except Exception as e:
+                print(f"Error adding user: {e}")
+                pass
 
-    LazyDev = await message.reply_text("Please Wait ...")
-        # Check if there is a replied message and it is a photo
-    if replied and replied.photo:
-        # Save the photo file_id as a thumbnail for the user
-        await set_thumbnail(message.from_user.id, file_id=replied.photo.file_id)
-        await LazyDev.edit("**✅ Custom thumbnail set successfully!**")
-    else:
-        await LazyDev.edit("**❌ Please reply to a photo to set it as a custom thumbnail.**")
+        LazyDev = await message.reply_text("Please Wait ...")
+            # Check if there is a replied message and it is a photo
+        if replied and replied.photo:
+            # Save the photo file_id as a thumbnail for the user
+            await set_thumbnail(message.from_user.id, file_id=replied.photo.file_id)
+            await LazyDev.edit("**✅ Custom thumbnail set successfully!**")
+        else:
+            await LazyDev.edit("**❌ Please reply to a photo to set it as a custom thumbnail.**")
+    except Exception as lazyerror :
+        print(f'Here comes error : {lazyerror}')
 
-@Client.on_message(filters.private & filters.command(['view_lazy_thumb','vlt']))
-async def viewthumbnail(client, message):
-    id = message.from_user.id    
-    if not message.from_user:
-        return await message.reply_text("What the hell is this...")
-    
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass  
-    thumbnail = await get_lazy_thumbnail(message.from_user.id)
-    if thumbnail is not None:
-        await client.send_photo(
-        chat_id=message.chat.id,
-        photo=thumbnail,
-        caption=f"ʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ sᴀᴠᴇᴅ ᴛʜᴜᴍʙɴᴀɪʟ 🦠",
-        reply_markup=InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("🗑️ ᴅᴇʟᴇᴛᴇ ᴛʜᴜᴍʙɴᴀɪʟ", callback_data="deleteurlthumbnail")]]
-                ),
-        reply_to_message_id=message.id)
-    else:
-        await message.reply_text(text=f"ɴᴏ ᴛʜᴜᴍʙɴᴀɪʟ ғᴏᴜɴᴅ 🤒")
-
-@Client.on_message(filters.private & filters.command(['del_lazy_thumb','delete_lazy_thumb','dlt']))
-async def removethumbnail(client, message):
-    id = message.from_user.id
-    if not message.from_user:
-        return await message.reply_text("What the hell is this...")
-    
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass
-
-    await set_lazy_thumbnail(message.from_user.id, thumbnail=None)
-    await message.reply_text(
-        "**🗑️ Okay baby, I deleted your custom thumbnail for url downloading. Now I will apply default thumbnail. ☑**",
-
-    )
-
-@Client.on_message(filters.private & filters.command(['set_lazy_thumb','set_lazy_thumbnail', 'slt']))
-async def add_thumbnail(client, message):
-    replied = message.reply_to_message
-    id = message.from_user.id
-    if not message.from_user:
-        return await message.reply_text("What the hell is this...")
-    
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass    
-
-    editable = await message.reply_text("**👀 Processing...**")
-    
-    # Check if there is a replied message and it is a photo
-    if replied and replied.photo:
-        # Save the photo file_id as a thumbnail for the user
-        await set_lazy_thumbnail(message.from_user.id, thumbnail=replied.photo.file_id)
-        await editable.edit("**✅ Custom thumbnail set successfully!**")
-    else:
-        await editable.edit("**❌ Please reply to a photo to set it as a custom thumbnail.**")
 
 
 async def Gthumb01(bot, update):
