@@ -94,10 +94,10 @@ async def start_command(client: Client, message: Message):
             [
                 [
                     InlineKeyboardButton('⚡️ ᴍᴏᴠɪᴇs', url='https://t.me/moviesimplyfytuber'),
-                    InlineKeyboardButton('🍁 🇨​​​​​🇷​​​​​🇮​​​​​🇨​​​​​🇰​​​​​🇪​​​​​🇹​​​​​ 🇳​​​​​🇪​​​​​🇼​​​​​🇸​​​​​', url='https://telegram.me/cricketediting')
+                    InlineKeyboardButton('🍁 ᴄʀɪᴄᴋᴇᴛ ɴᴇᴡꜱ​​​​​', url='https://telegram.me/cricketediting')
                 ],
                 [
-                    InlineKeyboardButton('🍿.  🇫​​​​​🇷​​​​​🇪​​​​​🇪​​​​​ 🇦​​​​​🇵​​​​​🇵​​​​​🇸​​​​​  .🚀', url='https://telegram.me/simplifytuberyt')
+                    InlineKeyboardButton('🍿.  ꜰʀᴇᴇ ᴀᴘᴘꜱ​  .🚀', url='https://telegram.me/simplifytuberyt')
                 ]
             ]
         )

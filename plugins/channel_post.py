@@ -5,9 +5,10 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
 from database.database import present_user, add_user
 from bot import Bot
-from config import ADMINS, CHANNEL_ID, DISABLE_CHANNEL_BUTTON
+from config import ADMINS, CHANNEL_ID, DISABLE_CHANNEL_BUTTON, FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, FORCE_SUB_CHANNEL3
 from helper_func import encode
-from lazydeveloperr.lazy_forcesub import lazy_force_sub,lazy_channel_user
+from lazydeveloperr.lazy_forcesub import lazy_force_sub, lazy_channel_user, is_subscribed
+
 @Bot.on_message(filters.private & (filters.document | filters.video | filters.audio) & ~filters.command(['start','users','broadcast','batch','genlink','stats']))
 async def channel_post(client: Client, message: Message):
     user_id = message.from_user.id
@@ -17,8 +18,11 @@ async def channel_post(client: Client, message: Message):
         except Exception as e:
             print(f"Error adding user: {e}")
             pass
-    if not await lazy_channel_user(client, user_id):
+
+    if FORCE_SUB_CHANNEL and FORCE_SUB_CHANNEL2 and FORCE_SUB_CHANNEL3 and not await is_subscribed(client, message):
+        # User is not subscribed to any of the required channels, trigger force_sub logic
         return await lazy_force_sub(client, message)
+
     reply_text = await message.reply_text("Please Wait...!", quote = True)
     try:
         post_message = await message.copy(chat_id = client.db_channel.id, disable_notification=True)

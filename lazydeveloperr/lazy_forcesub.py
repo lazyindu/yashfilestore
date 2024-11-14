@@ -1,8 +1,8 @@
 from pyrogram.errors import ChatAdminRequired
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram import Client,  __version__
+from pyrogram import Client,  __version__, enums
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from pyrogram.errors import ChatAdminRequired
+from pyrogram.errors import ChatAdminRequired,UserNotParticipant
 from config import *
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,20 @@ async def lazy_channel_user(client: Client, user_id: int):
         except Exception:
             return False
     return True
+
+async def is_subscribed(bot, query):
+    required_channels = [FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, FORCE_SUB_CHANNEL3]
+    for channels in required_channels:
+        try:
+            user = await bot.get_chat_member(channels, query.from_user.id)
+        except UserNotParticipant:
+            pass
+        except Exception as e:
+            logger.exception(e)
+        else:
+            if user.status != enums.ChatMemberStatus.BANNED:
+                return True
+    return False
 
 async def lazy_force_sub(client: Client, message: Message):
     try:
