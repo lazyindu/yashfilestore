@@ -38,7 +38,7 @@ async def lazy_force_sub(client: Client, message: Message):
             [
                 InlineKeyboardButton(
                     text='ʀᴇʟᴏᴀᴅ',
-                    url=f"https://t.me/{client.username}?start={message.command[1]}"
+                    url=f"https://t.me/{client.username}"
                 )
             ]
         )
