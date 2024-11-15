@@ -75,30 +75,33 @@ async def addthumbs(client, message):
         id = message.from_user.id
         if not message.from_user:
             return await message.reply_text("What the hell is this...")
-        
+        print(f'1')
         if not await present_user(id):
             try:
                 await add_user(id)
             except Exception as e:
                 print(f"Error adding user: {e}")
                 pass
-
+        print(f'2')
         LazyDev = await message.reply_text("Please Wait ...")
+        print(f'3')
             # Check if there is a replied message and it is a photo
         if replied and replied.photo:
+            print(f'4')
             # Save the photo file_id as a thumbnail for the user
-            await set_thumbnail(message.from_user.id, file_id=replied.photo.file_id)
+            await addthumb(message.from_user.id, file_id=replied.photo.file_id)
+            print(f'5')
             await LazyDev.edit("**✅ Custom thumbnail set successfully!**")
         else:
             await LazyDev.edit("**❌ Please reply to a photo to set it as a custom thumbnail.**")
     except Exception as lazyerror :
         print(f'Here comes error : {lazyerror}')
 
-@Client.on_message(filters.private & filters.photo)
-async def addthumbnail(client,message):
-	file_id = str(message.photo.file_id)
-	addthumb(message.chat.id , file_id)
-	await message.reply_text("**Custom thumbnail saved successfully** ✅")
+# @Client.on_message(filters.private & filters.photo)
+# async def addthumbnail(client,message):
+# 	file_id = str(message.photo.file_id)
+# 	addthumb(message.chat.id , file_id)
+# 	await message.reply_text("**Custom thumbnail saved successfully** ✅")
 
 async def Gthumb01(bot, update):
     thumb_image_path = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
