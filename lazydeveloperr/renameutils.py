@@ -8,7 +8,6 @@ import math
 import time 
 from Script import script
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram import enums
 
 async def progress_for_pyrogram(current, total, ud_type, message, start):
 

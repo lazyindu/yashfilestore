@@ -1,4 +1,4 @@
-https://codeload.github.com/KurimuzonAkuma/pyrogram/zip/refs/heads/dev
+# https://codeload.github.com/KurimuzonAkuma/pyrogram/zip/refs/heads/dev
 TgCrypto
 pyromod
 pymongo
@@ -12,3 +12,9 @@ werkzeug==2.0.2
 itsdangerous==2.0.1
 hachoir
 Pillow
+aiofiles
+motor
+pyrofork==2.3.45
+
+
+

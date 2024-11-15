@@ -2,26 +2,24 @@ import os, asyncio, humanize
 from pyrogram import Client, filters, __version__
 from pyrogram.enums import ParseMode
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from pyrogram.errors import FloodWait,ChatAdminRequired, UserIsBlocked, InputUserDeactivated
+from pyrogram.errors import FloodWait,ChatAdminRequired, UserIsBlocked, InputUserDeactivated, PeerIdInvalid
 from bot import Bot
 from config import *
 from helper_func import subscribed, encode, decode, get_messages
-from database.database import add_user, del_user, full_userbase, present_user
+from database.database import db
 logger = logging.getLogger(__name__)
-
+import time
+import logging 
+import datetime
 neha_delete_time = FILE_AUTO_DELETE
 neha = neha_delete_time
 file_auto_delete = humanize.naturaldelta(neha)
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
-    id = message.from_user.id
-    if not await present_user(id):
-        try:
-            await add_user(id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass
+    user = message.from_user
+    if not await db.is_user_exist(user.id):
+        await db.add_user(user.id) 
     
     text = message.text
     if len(text) > 7:
@@ -156,58 +154,56 @@ async def not_joined(client: Client, message: Message):
         disable_web_page_preview=True
     )
 
-@Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
-async def get_users(client: Bot, message: Message):
-    msg = await client.send_message(chat_id=message.chat.id, text=f"Processing...")
-    users = await full_userbase()
-    await msg.edit(f"{len(users)} Users Are Using This Bot")
+@Bot.on_message(filters.command("users") & filters.user(ADMINS))
+async def get_stats(bot :Client, message: Message):
+    mr = await message.reply('**𝙰𝙲𝙲𝙴𝚂𝚂𝙸𝙽𝙶 𝙳𝙴𝚃𝙰𝙸𝙻𝚂.....**')
+    total_users = await db.total_users_count()
+    await mr.edit( text=f"❤️‍🔥 TOTAL USER'S = `{total_users}`")
 
-@Bot.on_message(filters.private & filters.command('broadcast') & filters.user(ADMINS))
-async def send_text(client: Bot, message: Message):
-    if message.reply_to_message:
-        query = await full_userbase()
-        broadcast_msg = message.reply_to_message
-        total = 0
-        successful = 0
-        blocked = 0
-        deleted = 0
-        unsuccessful = 0
-        
-        pls_wait = await message.reply("<i>Broadcasting Message.. This will Take Some Time</i>")
-        for chat_id in query:
-            try:
-                await broadcast_msg.copy(chat_id)
-                successful += 1
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-                await broadcast_msg.copy(chat_id)
-                successful += 1
-            except UserIsBlocked:
-                await del_user(chat_id)
-                blocked += 1
-            except InputUserDeactivated:
-                await del_user(chat_id)
-                deleted += 1
-            except Exception as e:
-                print(f"Failed to send message to {chat_id}: {e}")
-                unsuccessful += 1
-                pass
-            total += 1
-        
-        status = f"""<b><u>Broadcast Completed</u></b>
-
-<b>Total Users :</b> <code>{total}</code>
-<b>Successful :</b> <code>{successful}</code>
-<b>Blocked Users :</b> <code>{blocked}</code>
-<b>Deleted Accounts :</b> <code>{deleted}</code>
-<b>Unsuccessful :</b> <code>{unsuccessful}</code>"""
-        
-        return await pls_wait.edit(status)
-
-    else:
-        msg = await message.reply(f"Use This Command As A Reply To Any Telegram Message Without Any Spaces.")
-        await asyncio.sleep(8)
-        await msg.delete()
+@Bot.on_message(filters.command("broadcast") & filters.user(ADMINS) & filters.reply)
+async def broadcast_handler(bot: Client, m: Message):
+    all_users = await db.get_all_users()
+    broadcast_msg = m.reply_to_message
+    sts_msg = await m.reply_text("broadcast started !") 
+    done = 0
+    failed = 0
+    success = 0
+    start_time = time.time()
+    total_users = await db.total_users_count()
+    async for user in all_users:
+        sts = await send_msg(user['_id'], broadcast_msg)
+        if sts == 200:
+           success += 1
+        else:
+           failed += 1
+        if sts == 400:
+           await db.delete_user(user['_id'])
+        done += 1
+        if not done % 20:
+           await sts_msg.edit(f"Broadcast in progress:\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+    completed_in = datetime.timedelta(seconds=int(time.time() - start_time))
+    await sts_msg.edit(f"Broadcast Completed:\nCompleted in `{completed_in}`.\n\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+           
+async def send_msg(user_id, message):
+    try:
+        await message.copy(chat_id=int(user_id))
+        return 200
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        return send_msg(user_id, message)
+    except InputUserDeactivated:
+        logger.info(f"{user_id} : deactivated")
+        return 400
+    except UserIsBlocked:
+        logger.info(f"{user_id} : blocked the bot")
+        return 400
+    except PeerIdInvalid:
+        logger.info(f"{user_id} : user id invalid")
+        return 400
+    except Exception as e:
+        logger.error(f"{user_id} : {e}")
+        return 500
+ 
 
 # Function to handle file deletion
 async def delete_files(messages, client, k):

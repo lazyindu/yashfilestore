@@ -3,21 +3,17 @@ import asyncio
 from pyrogram import filters, Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
-from database.database import present_user, add_user
+from database.database import db
 from bot import Bot
 from config import ADMINS, CHANNEL_ID, DISABLE_CHANNEL_BUTTON, FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, FORCE_SUB_CHANNEL3
 from helper_func import encode
-from lazydeveloperr.lazy_forcesub import lazy_force_sub, lazy_channel_user, is_subscribed
+from lazydeveloperr.lazy_forcesub import lazy_force_sub, is_subscribed
 
 @Bot.on_message(filters.private & (filters.document | filters.video | filters.audio) & ~filters.command(['start','users','broadcast','batch','genlink','stats']))
 async def channel_post(client: Client, message: Message):
-    user_id = message.from_user.id
-    if not await present_user(user_id):
-        try:
-            await add_user(user_id)
-        except Exception as e:
-            print(f"Error adding user: {e}")
-            pass
+    user = message.from_user
+    if not await db.is_user_exist(user.id):
+        await db.add_user(user.id) 
 
     if (FORCE_SUB_CHANNEL or FORCE_SUB_CHANNEL2 or FORCE_SUB_CHANNEL3) and not await is_subscribed(client, message):
         # User is not subscribed to any of the required channels, trigger force_sub logic
