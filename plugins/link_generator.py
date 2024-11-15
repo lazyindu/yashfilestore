@@ -7,7 +7,7 @@ from config import *
 
 @Bot.on_message(filters.private & filters.user(ADMINS) & filters.command('batch'))
 async def batch(client: Client, message: Message):
-    if message.from_user.id not in OWNER_ID:
+    if not int(message.from_user.id) == OWNER_ID:
         client.send_message(chat_id=message.from_user.id, text=f"Oh No : Where are your hands 😂\n\nThis command is only for my owner.\n\n👉Don't worry you can send me any video and i will generate you a permanent link ❤")
         return
     while True:
@@ -43,7 +43,7 @@ async def batch(client: Client, message: Message):
 
 @Bot.on_message(filters.private & filters.user(ADMINS) & filters.command('genlink'))
 async def link_generator(client: Client, message: Message):
-    if message.from_user.id not in OWNER_ID:
+    if not int(message.from_user.id) == OWNER_ID:
         client.send_message(chat_id=message.from_user.id, text=f"Oh No : Where are your hands 😂\n\nThis command is only for my owner.\n\n👉Don't worry you can send me any video and i will generate you a permanent link ❤")
         return
     while True:
