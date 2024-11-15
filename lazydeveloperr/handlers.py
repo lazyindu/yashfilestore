@@ -91,10 +91,10 @@ async def save_batch_media_in_channel(bot: Client, editable: Message, message_id
         # ✧ Don't remove credit ✧ @LazyDeveloper ✧
 
     except Exception as err:
-        await editable.edit(f"ꜱᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ...\n\n**Error:** `{err}`")
+        await editable.edit(f"ꜱᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ...\n\nError `{err}`")
         await bot.send_message(
             chat_id=int(LOG_CHANNEL),
-            text=f"#ERROR_TRACEBACK:\nGot Error from `{str(editable.chat.id)}` !!\n\n**Traceback:** `{err}`",
+            text=f"#ERROR_TRACEBACK:\nGot Error from `{str(editable.chat.id)}` !!\n\nTraceback: `{err}`",
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
                 [
