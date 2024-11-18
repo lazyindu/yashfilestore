@@ -160,29 +160,78 @@ async def get_stats(bot :Client, message: Message):
     total_users = await db.total_users_count()
     await mr.edit( text=f"❤️‍🔥 TOTAL USER'S = `{total_users}`")
 
-@Bot.on_message(filters.command("broadcast") & filters.user(ADMINS) & filters.reply)
-async def broadcast_handler(bot: Client, m: Message):
-    all_users = await db.get_all_users()
-    broadcast_msg = m.reply_to_message
-    sts_msg = await m.reply_text("broadcast started !") 
-    done = 0
-    failed = 0
-    success = 0
-    start_time = time.time()
-    total_users = await db.total_users_count()
-    async for user in all_users:
-        sts = await send_msg(user['_id'], broadcast_msg)
-        if sts == 200:
-           success += 1
-        else:
-           failed += 1
-        if sts == 400:
-           await db.delete_user(user['_id'])
-        done += 1
-        if not done % 20:
-           await sts_msg.edit(f"Broadcast in progress:\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
-    completed_in = datetime.timedelta(seconds=int(time.time() - start_time))
-    await sts_msg.edit(f"Broadcast Completed:\nCompleted in `{completed_in}`.\n\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+
+@Bot.on_message(filters.private & filters.command('broadcast') & filters.user(ADMINS))
+async def send_text(client: Bot, message: Message):
+    if message.reply_to_message:
+        query = await db.full_userbase()
+        broadcast_msg = message.reply_to_message
+        total = 0
+        successful = 0
+        blocked = 0
+        deleted = 0
+        unsuccessful = 0
+        
+        pls_wait = await message.reply("<i>Broadcasting Message.. This will Take Some Time</i>")
+        for chat_id in query:
+            try:
+                await broadcast_msg.copy(chat_id)
+                successful += 1
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+                await broadcast_msg.copy(chat_id)
+                successful += 1
+            except UserIsBlocked:
+                await db.del_user(chat_id)
+                blocked += 1
+            except InputUserDeactivated:
+                await db.del_user(chat_id)
+                deleted += 1
+            except Exception as e:
+                print(f"Failed to send message to {chat_id}: {e}")
+                unsuccessful += 1
+                pass
+            total += 1
+        
+        status = f"""<b><u>Broadcast Completed</u></b>
+
+<b>Total Users :</b> <code>{total}</code>
+<b>Successful :</b> <code>{successful}</code>
+<b>Blocked Users :</b> <code>{blocked}</code>
+<b>Deleted Accounts :</b> <code>{deleted}</code>
+<b>Unsuccessful :</b> <code>{unsuccessful}</code>"""
+        
+        return await pls_wait.edit(status)
+
+    else:
+        msg = await message.reply(f"Use This Command As A Reply To Any Telegram Message Without Any Spaces.")
+        await asyncio.sleep(8)
+        await msg.delete()
+
+
+# @Bot.on_message(filters.command("broadcast") & filters.user(ADMINS) & filters.reply)
+# async def broadcast_handler(bot: Client, m: Message):
+#     all_users = await db.get_all_users()
+#     broadcast_msg = m.reply_to_message
+#     sts_msg = await m.reply_text("broadcast started !") 
+#     done = 0
+#     failed = 0
+#     success = 0
+#     start_time = time.time()
+#     total_users = await db.total_users_count()
+#     async for user in all_users:
+#         sts = await send_msg(user['_id'], broadcast_msg)
+#         if sts == 200:
+#            success += 1
+#         else:
+#            failed += 1
+#         if sts == 400:
+#            await db.delete_user(user['_id'])
+#         done += 1
+#         if not done % 20:
+#            await sts_msg.edit(f"Broadcast in progress:\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
+#     completed_in = datetime.timedelta(seconds=int(time.time() - start_time))
+#     await sts_msg.edit(f"Broadcast Completed:\nCompleted in `{completed_in}`.\n\nTotal Users {total_users}\nCompleted: {done} / {total_users}\nSuccess: {success}\nFailed: {failed}")
            
 async def send_msg(user_id, message):
     try:
