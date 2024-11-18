@@ -39,6 +39,18 @@ class Database:
         all_users = self.col.find({})
         return all_users
     
+    async def full_userbase(self):
+        user_docs = self.col.find()
+        user_ids = []
+        for doc in user_docs:
+            user_ids.append(doc['_id'])
+            
+        return user_ids
+
+    async def del_user(self, user_id: int):
+        self.col.delete_one({'_id': user_id})
+        return
+    
     async def set_thumbnail(self, id, file_id):
         await self.col.update_one({'_id': int(id)}, {'$set': {'file_id': file_id}})
 
